@@ -144,7 +144,7 @@
     </div>
 
     <script>
-        const videos = [
+        var videos = [
             { src: '/videos/九流歌手_360P.mp4', lyrics: '九流歌手的歌词内容...', title: '九流歌手_360P.mp4' },
             { src: '/videos/奔流_360P.mp4', lyrics: '奔流的歌词内容...', title: '奔流_360P.mp4' },
             { src: '/videos/妖魔_360P.mp4', lyrics: '妖魔的歌词内容...', title: '妖魔_360P.mp4' },
@@ -152,33 +152,36 @@
             { src: '/videos/贱侠_360P.mp4', lyrics: '贱侠的歌词内容...', title: '贱侠_360P.mp4' }
         ];
 
-        let currentVideoIndex = 0;
-        let playMode = 'loop';
+        var currentVideoIndex = 0;
+        var playMode = 'loop';
 
         document.getElementById('mainVideo').addEventListener('ended', handleVideoEnd);
 
         window.onload = function() {
-            const videoList = document.getElementById('videoList');
-            videos.forEach((video, index) => {
-                const videoItem = document.createElement('a');
-                videoItem.href = video.src;
-                videoItem.textContent = video.title;
+            var videoList = document.getElementById('videoList');
+            for (var i = 0; i < videos.length; i++) {
+                var videoItem = document.createElement('a');
+                videoItem.href = videos[i].src;
+                videoItem.textContent = videos[i].title;
                 videoItem.className = 'video-item';
-                videoItem.onclick = (event) => playVideo(event, video.src, index);
+                videoItem.dataset.index = i;
+                videoItem.onclick = function(event) {
+                    event.preventDefault();
+                    playVideo(this.dataset.index);
+                };
                 videoList.appendChild(videoItem);
-            });
+            }
         }
 
-        function playVideo(event, videoSrc, index) {
-            event.preventDefault(); // 阻止默认的链接跳转行为
-            const video = document.getElementById('mainVideo');
-            const source = document.getElementById('videoSource');
-            video.pause(); // 在设置新源之前暂停视频
-            source.src = videoSrc;
+        function playVideo(index) {
+            var video = document.getElementById('mainVideo');
+            var source = document.getElementById('videoSource');
+            video.pause();
+            source.src = videos[index].src;
             currentVideoIndex = index;
             updateLyrics(index);
             video.load();
-            video.play().catch(error => {
+            video.play().catch(function(error) {
                 console.error('播放失败:', error);
             });
         }
@@ -190,11 +193,11 @@
                     break;
                 case 'playlist':
                     currentVideoIndex = (currentVideoIndex + 1) % videos.length;
-                    playVideo(new Event('ended'), videos[currentVideoIndex].src, currentVideoIndex);
+                    playVideo(currentVideoIndex);
                     break;
                 case 'random':
                     currentVideoIndex = Math.floor(Math.random() * videos.length);
-                    playVideo(new Event('ended'), videos[currentVideoIndex].src, currentVideoIndex);
+                    playVideo(currentVideoIndex);
                     break;
             }
         }
@@ -208,7 +211,7 @@
         }
 
         function updateLyrics(index) {
-            const lyricsContainer = document.getElementById('lyrics');
+            var lyricsContainer = document.getElementById('lyrics');
             lyricsContainer.textContent = videos[index].lyrics;
         }
     </script>
