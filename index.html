@@ -171,16 +171,26 @@
                 };
                 videoList.appendChild(videoItem);
             }
+            // 预加载第一个视频
+            preloadVideo(0);
+        }
+
+        function preloadVideo(index) {
+            var video = document.getElementById('mainVideo');
+            var source = document.getElementById('videoSource');
+            source.src = videos[index].src;
+            video.load();
         }
 
         function playVideo(index) {
             var video = document.getElementById('mainVideo');
-            var source = document.getElementById('videoSource');
-            video.pause();
-            source.src = videos[index].src;
-            currentVideoIndex = index;
-            updateLyrics(index);
-            video.load();
+            if (index !== currentVideoIndex) {
+                var source = document.getElementById('videoSource');
+                source.src = videos[index].src;
+                currentVideoIndex = index;
+                updateLyrics(index);
+                video.load();
+            }
             video.play().catch(function(error) {
                 console.error('播放失败:', error);
             });
